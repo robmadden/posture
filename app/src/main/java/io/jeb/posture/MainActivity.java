@@ -27,7 +27,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     private float[] mGeomagnetic;
     private float[] mGravity;
 
-    private static final float MAX_BRIGHTNESS = 255;
+    private static final float MAX_BRIGHTNESS = 1;
     private static final float BEST_ANGLE = 90;
     private static final float MULTIPLICATION_FACTOR = MAX_BRIGHTNESS / BEST_ANGLE;
 
@@ -85,17 +85,20 @@ public class MainActivity extends Activity implements SensorEventListener {
     }
 
     /*
-     * Take the pitch as a value in degrees and map it to a value between 0 and 255
+     * Take the pitch as a value in degrees and map it to a value between 0 and 1
      * which are the allowable values for brightness
      */
     private float mapPitchToBrightness(float pitch) {
         // Calculate theta which is the angle of the pitch
         // 0: phone is horizontal to the ground
         // 90: phone is perpendicular to the ground
-        float theta = (-pitch*360) / (float) (2 * (float)Math.PI);
+        float theta = (-pitch*360) / (2 * (float)Math.PI);
+        float brightness = theta * MULTIPLICATION_FACTOR;
 
-        // map theta to a scale of 0 to 255
-        return theta * MULTIPLICATION_FACTOR;
+        Log.d("THETA: ", String.valueOf(theta));
+        Log.d("BRIGHTNESS: ", String.valueOf(brightness));
+
+        return brightness;
     }
 
     @Override
@@ -121,12 +124,10 @@ public class MainActivity extends Activity implements SensorEventListener {
 
 //                Log.d("ORIENTATION: ", "Azimuth: " + azimuth + " Pitch: " + pitch + " Roll: " + roll);
 
-                WindowManager.LayoutParams p = window.getAttributes();
-
-                int brightness = (int) mapPitchToBrightness(pitch);
-                Log.d("BRIGHTNESS: ", String.valueOf(brightness));
-                p.screenBrightness = brightness;
-                window.setAttributes(p);
+                float brightness = mapPitchToBrightness(pitch);
+                WindowManager.LayoutParams lp = getWindow().getAttributes();
+                lp.screenBrightness = brightness;
+                getWindow().setAttributes(lp);
             }
         }
     }
