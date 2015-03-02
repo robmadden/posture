@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-import android.view.WindowManager;
 
 public class DimReceiver extends BroadcastReceiver {
     private Activity activity;
@@ -18,10 +17,8 @@ public class DimReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        float brightness = intent.getFloatExtra(DimService.INTENT_EXTRA_BRIGHTNESS, 1);
+        int brightness = intent.getIntExtra(DimService.INTENT_EXTRA_BRIGHTNESS, 1);
         Log.d("BRIGHTNESS: ", String.valueOf(brightness));
-        WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
-        lp.screenBrightness = brightness;
-        activity.getWindow().setAttributes(lp);
+        android.provider.Settings.System.putInt(context.getContentResolver(), android.provider.Settings.System.SCREEN_BRIGHTNESS, brightness);
     }
 }

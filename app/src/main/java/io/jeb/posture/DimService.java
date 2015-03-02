@@ -20,7 +20,7 @@ public class DimService extends IntentService implements SensorEventListener {
     private float[] mGravity;
 
     public static final String INTENT_EXTRA_BRIGHTNESS = "brightness";
-    private static final float MAX_BRIGHTNESS = 1;
+    private static final float MAX_BRIGHTNESS = 255;
     private static final float BEST_ANGLE = 90;
     private static final float MULTIPLICATION_FACTOR = MAX_BRIGHTNESS / BEST_ANGLE;
 
@@ -55,12 +55,12 @@ public class DimService extends IntentService implements SensorEventListener {
      * Take the pitch as a value in degrees and map it to a value between 0 and 1
      * which are the allowable values for brightness
      */
-    private float mapPitchToBrightness(float pitch) {
+    private int mapPitchToBrightness(float pitch) {
         // Calculate theta which is the angle of the pitch
         // 0: phone is horizontal to the ground
         // 90: phone is perpendicular to the ground
         float theta = (-pitch*360) / (2 * (float)Math.PI);
-        float brightness = theta * MULTIPLICATION_FACTOR;
+        int brightness = (int) (theta * MULTIPLICATION_FACTOR);
 
 //        Log.d("THETA: ", String.valueOf(theta));
 //        Log.d("BRIGHTNESS: ", String.valueOf(brightness));
@@ -96,7 +96,7 @@ public class DimService extends IntentService implements SensorEventListener {
 
 //                Log.d("ORIENTATION: ", "Azimuth: " + azimuth + " Pitch: " + pitch + " Roll: " + roll);
 
-                float brightness = mapPitchToBrightness(pitch);
+                int brightness = mapPitchToBrightness(pitch);
                 Intent i = new Intent();
                 i.setAction(Intent.ACTION_SEND);
                 i.putExtra(INTENT_EXTRA_BRIGHTNESS, brightness);
