@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,6 +13,7 @@ import android.view.MenuItem;
 
 public class MainActivity extends Activity {
     private BroadcastReceiver receiver;
+    private int originalBrightnessSetting;
     public static LocalBroadcastManager broadcastManager;
 
     @Override
@@ -24,6 +26,12 @@ public class MainActivity extends Activity {
         receiver = new DimReceiver(this);
         broadcastManager = LocalBroadcastManager.getInstance(this);
         broadcastManager.registerReceiver(receiver, filter);
+
+        try {
+            originalBrightnessSetting = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE);
+        } catch (Settings.SettingNotFoundException e) {
+            originalBrightnessSetting = -1;
+        }
 
         // Start the dim service
         startService(new Intent(this, DimService.class));
@@ -55,6 +63,11 @@ public class MainActivity extends Activity {
     public void onDestroy() {
         super.onDestroy();
         broadcastManager.unregisterReceiver(receiver);
+
+        if (originalBrightnessSetting > 0) {
+            Settings.System.putInt(getContentResolver(),
+                    Settings.System.SCREEN_BRIGHTNESS_MODE, originalBrightnessSetting);
+        }
     }
 
     @Override
