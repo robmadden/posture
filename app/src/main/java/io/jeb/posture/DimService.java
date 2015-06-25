@@ -20,9 +20,10 @@ public class DimService extends IntentService implements SensorEventListener {
     private float[] mGravity;
 
     public static final String INTENT_EXTRA_BRIGHTNESS = "brightness";
-    private static final float MAX_BRIGHTNESS = 255;
+    private static final float MIN_TRANSPARENCY = 255; // 0xFF000000
+    private static final float MAX_TRANSPARENCY = 0;   // 0x00000000
     private static final float BEST_ANGLE = 90;
-    private static final float MULTIPLICATION_FACTOR = MAX_BRIGHTNESS / BEST_ANGLE;
+    private static final float MULTIPLICATION_FACTOR = MIN_TRANSPARENCY / BEST_ANGLE;
 
     public DimService() {
         super("DimService");
@@ -60,12 +61,14 @@ public class DimService extends IntentService implements SensorEventListener {
         // 0: phone is horizontal to the ground
         // 90: phone is perpendicular to the ground
         float theta = (-pitch*360) / (2 * (float)Math.PI);
-        int brightness = (int) (theta * MULTIPLICATION_FACTOR);
+        int brightness = (int) Math.abs(-MIN_TRANSPARENCY + (theta * MULTIPLICATION_FACTOR));
+        int background = brightness << 24;
 
-//        Log.d("THETA: ", String.valueOf(theta));
-//        Log.d("BRIGHTNESS: ", String.valueOf(brightness));
+        Log.d("THETA: ", String.valueOf(theta));
+        Log.d("BRIGHTNESS: ", String.valueOf(brightness));
+        Log.d("BACKGROUND: ", String.valueOf(background));
 
-        return brightness;
+        return background;
     }
 
     @Override
